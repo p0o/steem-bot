@@ -1,0 +1,36 @@
+{
+  "name": "steem-bot",
+  "version": "1.0.0",
+  "description": "Easy automation on top of Steem blockchain",
+  "main": "dist/loader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./dist && mkdir dist && babel src --out-dir ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p0o/steem-bot.git"
+  },
+  "keywords": [
+    "steem",
+    "steemit",
+    "blockchain",
+    "automation",
+    "bot"
+  ],
+  "author": "p0o",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/p0o/steem-bot/issues"
+  },
+  "homepage": "https://github.com/p0o/steem-bot#readme",
+  "dependencies": {
+    "steem": "^0.6.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.24.1"
+  }
+}
