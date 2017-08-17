@@ -2,7 +2,7 @@ import steem from 'steem';
 import SteemBotCore from './core';
 import { ALL_USERS } from './constants';
 
-function loadConfig(args) {
+function getConfig(args) {
   let targets;
   let handler;
 
