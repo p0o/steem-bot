@@ -1,4 +1,5 @@
 import steem from 'steem';
+import { ALL_USERS } from './constants';
 
 class SteemBotCore {
   constructor({username, activeKey, config}) {
@@ -8,41 +9,38 @@ class SteemBotCore {
     this.init();
   }
 
-  handleVoteOperation(op) {
-    if (this.config.vote && typeof(this.config.vote.handler) === 'function') {
-      const { targets } = this.config.deposit;
-
-      if (targets.includes(op.voter)) {
-        this.config.voteHandler(op);
-      }
-    }
-  }
-
   handlePostOperation(op) {
     if (this.config.post && typeof(this.config.post.handler) === 'function') {
-      const { targets } = this.config.post;
+      const { targets, handler } = this.config.post;
 
-      if (targets.includes(op.author)) {
-        this.config.commentHandler(op);
+      if (typeof(targets) === 'string' && targets === ALL_USERS) {
+        handler(op);
+      } else if (targets.includes(op.author)) {
+        handler(op);
       }
     }
   }
 
   handleCommentOperation(op) {
     if (this.config.comment && typeof(this.config.comment.handler) === 'function') {
-      const { targets } = this.config.comment;
+      const { targets, handler } = this.config.comment;
       
-      if (targets.includes(op.author)) {
-        this.config.commentHandler(op);
+      if (typeof(targets) === 'string' && targets === ALL_USERS) {
+        handler(op);
+      } else if (targets.includes(op.author)) {
+        handler(op);
       }
+    }
   }
 
   handleTransferOperation(op) {
     if (this.config.deposit && typeof(this.config.deposit.handler) === 'function') {
-      const { targets } = this.config.deposit;
+      const { targets, handler } = this.config.deposit;
       
-      if (targets.includes(op.to)) {
-        this.config.depositHandler(op);
+      if (typeof(targets) === 'string' && targets === ALL_USERS) {
+        handler(op);
+      } else if (targets.includes(op.to)) {
+        handler(op);
       }
     }
   }
@@ -58,9 +56,6 @@ class SteemBotCore {
       const op = res[1];
 
       switch(opType) {
-        case 'vote':
-          this.handleVoteOperation(op);
-          break;
         case 'comment':
           // Both posts and comments are known as 'comment' in this API, so we recognize them by checking the
           // value of parent_author
