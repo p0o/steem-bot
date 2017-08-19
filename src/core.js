@@ -1,5 +1,6 @@
 import steem from 'steem';
 import { ALL_USERS } from './constants';
+import Responder from './responder';
 
 class SteemBotCore {
   constructor({username, activeKey, config}) {
@@ -12,11 +13,12 @@ class SteemBotCore {
   handlePostOperation(op) {
     if (this.config.post && typeof(this.config.post.handler) === 'function') {
       const { targets, handler } = this.config.post;
+      const responder = new Responder(op.author, op.permlink, this.postingKey, this.activeKey);
 
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
-        handler(op);
+        handler(op, responder);
       } else if (targets.includes(op.author)) {
-        handler(op);
+        handler(op, responder);
       }
     }
   }
@@ -24,11 +26,12 @@ class SteemBotCore {
   handleCommentOperation(op) {
     if (this.config.comment && typeof(this.config.comment.handler) === 'function') {
       const { targets, handler } = this.config.comment;
+      const responder = new Responder(op.author, op.permlink, this.postingKey, this.activeKey);
       
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
-        handler(op);
+        handler(op, responder);
       } else if (targets.includes(op.author)) {
-        handler(op);
+        handler(op, responder);
       }
     }
   }
@@ -36,11 +39,12 @@ class SteemBotCore {
   handleTransferOperation(op) {
     if (this.config.deposit && typeof(this.config.deposit.handler) === 'function') {
       const { targets, handler } = this.config.deposit;
+      const responder = new Responder(op.from, '', this.postingKey, this.activeKey);
       
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
-        handler(op);
+        handler(op, responder);
       } else if (targets.includes(op.to)) {
-        handler(op);
+        handler(op, responder);
       }
     }
   }
