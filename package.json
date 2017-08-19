@@ -1,6 +1,6 @@
 {
   "name": "steem-bot",
-  "version": "1.0.0",
+  "version": "0.7.0",
   "description": "Easy automation on top of Steem blockchain",
   "main": "dist/loader.js",
   "scripts": {
