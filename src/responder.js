@@ -61,8 +61,24 @@ export default class Responder {
       );
     }
 
-    // TODO: send a comment with steemjs
-    
+    const permlink = createCommentPermlink(this.targetUsername, this.targetPermlink);
+    const wif = this.postingKey || this.activeKey;
+    const jsonMetadata = JSON.stringify({
+      app: `steembot/${steemBotVersion}`,
+    });
+
+    steem.broadcast.comment(
+      wif,
+      this.targetUsername,
+      this.targetPermlink,
+      this.responderUsername,
+      permlink,
+      '',
+      body,
+      jsonMetadata,
+    ).catch(err => {
+      throw(new Error(`Error in sending comment to ${this.targetUsername}/${targetPermlink}\n${err.message}`));
+    });
   }
 
   upvote()
