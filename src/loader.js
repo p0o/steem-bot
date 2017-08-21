@@ -25,8 +25,9 @@ function getConfig(args) {
 }
 
 export default class SteemBot {
-  constructor(username, activeKey) {
+  constructor({username, postingKey, activeKey}) {
     this.username = username && username.replace(/^@/, '');
+    this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = {};
 
@@ -51,6 +52,7 @@ export default class SteemBot {
     const loader = new SteemBotCore({
       username: this.username,
       activeKey: this.activeKey,
+      postingKey: this.postingKey,
       config: this.config,
     });
   }

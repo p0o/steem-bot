@@ -47,7 +47,7 @@ export default class Responder {
 
   comment(message) {
     // early exits
-    if (!this.permlink) {
+    if (!this.targetPermlink) {
       throw(
         new Error(
           'You cannot send a comment to a responder comming from a deposit. There is no address to send a comment to!'
@@ -55,7 +55,7 @@ export default class Responder {
       );
     }
 
-    if (!this.postingKey || !this.activeKey) {
+    if (!(this.postingKey || this.activeKey)) {
       throw(
         new Error('You need to introduce a postingKey or activeKey to SteemBot\'s constructor')
       );
@@ -67,21 +67,21 @@ export default class Responder {
       app: `steembot/${steemBotVersion}`,
     });
 
-    steem.broadcast.comment(
+    steem.broadcast.commentAsync(
       wif,
       this.targetUsername,
       this.targetPermlink,
       this.responderUsername,
       permlink,
       '',
-      body,
+      message,
       jsonMetadata,
     ).catch(err => {
-      throw(new Error(`Error in sending comment to ${this.targetUsername}/${targetPermlink}\n${err.message}`));
+      throw(new Error(`Error in sending comment to ${this.targetUsername}/${this.targetPermlink}\n${err.message}`));
     });
   }
 
-  upvote()
+  upvote() {}
 
-  downvote()
+  downvote() {}
 }
