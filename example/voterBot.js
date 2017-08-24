@@ -11,9 +11,10 @@ const SteemBot = require('../src/loader').default;
 const username = 'Your Steem Username';
 const postingKey = 'Your Posting Key Here!'; // Use environment variables instead of hardcoding to be safer
 
+const targetUsers = ['p0o', 'ned']; // put as many users as you want in this array or omit the argument for all users
 const bot = new SteemBot({username, postingKey});
 
-bot.onComment('p0o-dev', handleComment);
+bot.onComment(targetUsers, handleComment);
 
 function handleComment(data, responder) {
   console.log('user %s commented!', data.author);
