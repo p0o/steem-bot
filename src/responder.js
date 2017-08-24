@@ -28,6 +28,10 @@ function getContent(author, permlink) {
   return steem.api.getContentAsync(author, permlink);
 }
 
+function convert2VotingWeight(votingPercentage) {
+  return Math.min(votingPercentage.toFixed(2) * 100, 10000);
+}
+
 export default class Responder {
   constructor(targetUsername, targetPermlink, responderUsername, postingKey, activeKey) {
     this.targetUsername = targetUsername;
@@ -35,6 +39,24 @@ export default class Responder {
     this.responderUsername = responderUsername;
     this.postingKey = postingKey;
     this.activeKey = activeKey;
+  }
+
+  _throwErrorIfNoKey() {
+    if (!(this.postingKey || this.activeKey)) {
+      throw(
+        new Error('You need to introduce a postingKey or activeKey to SteemBot\'s constructor')
+      );
+    }
+  }
+
+  _throwErrorIfNoPermlink() {
+    if (!this.targetPermlink) {
+      throw(
+        new Error(
+          'You cannot send a comment to a responder comming from a deposit. There is no address to send a comment to!'
+        )
+      );
+    }
   }
 
   sendSteem(amount, memo) {
@@ -47,19 +69,8 @@ export default class Responder {
 
   comment(message) {
     // early exits
-    if (!this.targetPermlink) {
-      throw(
-        new Error(
-          'You cannot send a comment to a responder comming from a deposit. There is no address to send a comment to!'
-        )
-      );
-    }
-
-    if (!(this.postingKey || this.activeKey)) {
-      throw(
-        new Error('You need to introduce a postingKey or activeKey to SteemBot\'s constructor')
-      );
-    }
+    this._throwErrorIfNoPermlink();
+    this._throwErrorIfNoKey();
 
     const permlink = createCommentPermlink(this.targetUsername, this.targetPermlink);
     const wif = this.postingKey || this.activeKey;
@@ -81,7 +92,57 @@ export default class Responder {
     });
   }
 
-  upvote() {}
+  upvote(votingPercentage = 100.0) {
+    this._throwErrorIfNoKey();
 
-  downvote() {}
+    if (typeof(votingPercentage) === 'string') {
+      votingPercentage = parseFloat(votingPercentage);
+    }
+
+    if (votingPercentage < 0) {
+      throw(new Error(`Don't use negative numbers on upvote() method. Use downvote() instead.`));
+    }
+
+    const votingWeight = convert2VotingWeight(votingPercentage);
+    const wif = this.postingKey || this.activeKey;
+
+    steem.broadcast.voteAsync(
+      wif,
+      this.responderUsername,
+      this.targetUsername,
+      this.targetPermlink,
+      votingWeight
+    ).catch((err) => {
+      throw(new Error(`Error in voting`));
+    });
+  }
+
+  downvote(votingPercentage = 100.0) {
+    this._throwErrorIfNoKey();
+
+    if (typeof(votingPercentage) === 'string') {
+      votingPercentage = parseFloat(votingPercentage);
+    }
+
+    if (votingPercentage < 0) {
+      throw(
+        new Error(
+          `Don't use negative numbers on downvote() method. The vote will be negative from this API anyway.`
+        )
+      );
+    }
+
+    const votingWeight = convert2VotingWeight(votingPercentage) * -1;
+    const wif = this.postingKey || this.activeKey;
+
+    steem.broadcast.voteAsync(
+      wif,
+      this.responderUsername,
+      this.targetUsername,
+      this.targetPermlink,
+      votingWeight,
+    ).catch((err) => {
+      throw(new Error(`Error in voting from Steem API ${err.message}`));
+    });
+  }
 }
