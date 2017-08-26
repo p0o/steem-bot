@@ -49,6 +49,14 @@ export default class Responder {
     }
   }
 
+  _throwErrorIfNoActiveKey() {
+    if (!(this.activeKey)) {
+      throw(
+        new Error('You need to introduce an activeKey to SteemBot\'s constructor')
+      );
+    }
+  }
+
   _throwErrorIfNoPermlink() {
     if (!this.targetPermlink) {
       throw(
@@ -59,12 +67,36 @@ export default class Responder {
     }
   }
 
-  sendSteem(amount, memo) {
-  
+  sendSteem(amount, memo = '') {
+    this._throwErrorIfNoActiveKey();
+
+    const from = this.responderUsername;
+    const to = this.targetUsername;
+    amount = `${parseFloat(amount)} STEEM`;
+
+    return steem.broadcast.transferAsync(
+      this.activeKey,
+      from,
+      to,
+      amount,
+      memo
+    );
   }
 
   sendSbd(amount, memo) {
+    this._throwErrorIfNoActiveKey();
 
+    const from = this.responderUsername;
+    const to = this.targetUsername;
+    amount = `${parseFloat(amount)} SBD`;
+
+    return steem.broadcast.transferAsync(
+      this.activeKey,
+      from,
+      to,
+      amount,
+      memo
+    );
   }
 
   comment(message) {
