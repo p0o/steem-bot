@@ -110,7 +110,7 @@ export default class Responder {
       app: `steembot/${steemBotVersion}`,
     });
 
-    steem.broadcast.commentAsync(
+    return steem.broadcast.commentAsync(
       wif,
       this.targetUsername,
       this.targetPermlink,
@@ -119,9 +119,7 @@ export default class Responder {
       '',
       message,
       jsonMetadata,
-    ).catch(err => {
-      throw(new Error(`Error in sending comment to ${this.targetUsername}/${this.targetPermlink}\n${err.message}`));
-    });
+    );
   }
 
   upvote(votingPercentage = 100.0) {
@@ -138,15 +136,13 @@ export default class Responder {
     const votingWeight = convert2VotingWeight(votingPercentage);
     const wif = this.postingKey || this.activeKey;
 
-    steem.broadcast.voteAsync(
+    return steem.broadcast.voteAsync(
       wif,
       this.responderUsername,
       this.targetUsername,
       this.targetPermlink,
       votingWeight
-    ).catch((err) => {
-      throw(new Error(`Error in voting`));
-    });
+    );
   }
 
   downvote(votingPercentage = 100.0) {
@@ -167,14 +163,12 @@ export default class Responder {
     const votingWeight = convert2VotingWeight(votingPercentage) * -1;
     const wif = this.postingKey || this.activeKey;
 
-    steem.broadcast.voteAsync(
+    return steem.broadcast.voteAsync(
       wif,
       this.responderUsername,
       this.targetUsername,
       this.targetPermlink,
       votingWeight,
-    ).catch((err) => {
-      throw(new Error(`Error in voting from Steem API ${err.message}`));
-    });
+    );
   }
 }
