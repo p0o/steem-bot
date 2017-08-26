@@ -72,7 +72,7 @@ export default class Responder {
 
     const from = this.responderUsername;
     const to = this.targetUsername;
-    amount = `${parseFloat(amount)} STEEM`;
+    amount = `${parseFloat(amount).toFixed(3)} STEEM`;
 
     return steem.broadcast.transferAsync(
       this.activeKey,
@@ -88,7 +88,7 @@ export default class Responder {
 
     const from = this.responderUsername;
     const to = this.targetUsername;
-    amount = `${parseFloat(amount)} SBD`;
+    amount = `${parseFloat(amount).toFixed(3)} SBD`;
 
     return steem.broadcast.transferAsync(
       this.activeKey,
