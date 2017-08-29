@@ -39,6 +39,14 @@ bot.onDeposit(targetUsers, (data) => {
 bot.start();
 ```
 
+## Examples
+
+Here you can find some sample codes of things you can do with SteemBot.
+
+- Depositing Steem or SBD from users [click here](https://github.com/p0o/steem-bot/blob/master/example/deposit.js)
+- Auto voting on every new post from a list of users [click here](https://github.com/p0o/steem-bot/blob/master/example/voterBot.js)
+- Randowhale popular bot, full implementation [click here](https://github.com/p0o/steem-bot/blob/master/example/randowhale.js)
+
 ## API
 
 The API is very consistent and follow the same set of rules.
@@ -150,13 +158,13 @@ Currently Responder provide you these methods to use:
 It's a common practice for bots (like randowhale, minnowbooster etc) to use a Steemit link in memos while depositing so the bot can use the link for any purpose (sending money or commenting). However, extracting the memo and performin low-level operations to use it is a headache, so SteemBot is providing helper methods to facilitate this process.
 
 **Responder.commentOnMemo(message)**
-Works similiar to `Responder.comment` but you can use it on deposit events when users include steemit link as memo. See [randowhale example] for more info.
+Works similiar to `Responder.comment` but you can use it on deposit events when users include steemit link as memo. See [randowhale example](https://github.com/p0o/steem-bot/blob/master/example/randowhale.js) for more info.
 
 **Responder.upvoteOnMemo(votingPercentage)**
-Works similiar to `Responder.upvote` but you can use it on deposit events when users include steemit link as memo. See [randowhale example] for more info.
+Works similiar to `Responder.upvote` but you can use it on deposit events when users include steemit link as memo. See [randowhale example](https://github.com/p0o/steem-bot/blob/master/example/randowhale.js) for more info.
 
 **Responder.downvoteOnMemo(votingPercentage)**
-Works similiar to `Responder.downvote` but you can use it on deposit events when users include steemit link as memo. See [randowhale example] for more info.
+Works similiar to `Responder.downvote` but you can use it on deposit events when users include steemit link as memo. See [randowhale example](https://github.com/p0o/steem-bot/blob/master/example/randowhale.js) for more info.
 
 # Further development
 This package is still under development. Feel free to use it and feedback using github issues.
