@@ -29,13 +29,46 @@ function getContent(author, permlink) {
 }
 
 function convert2VotingWeight(votingPercentage) {
-  return Math.min(votingPercentage.toFixed(2) * 100, 10000);
+  return Math.min(Math.floor(votingPercentage.toFixed(2) * 100), 10000);
+}
+
+function isValidSteemitLink(link) {
+  return link.match(/^https?:\/\/(www\.)?steemit\.com\//i);
+}
+
+/**
+ * Should input a full steemit article link and return the username of the author
+ * @param {string} steemitLink 
+ */
+function extractUsernameFromLink(steemitLink) {
+  if (isValidSteemitLink(steemitLink)) {
+    const usernamePos = steemitLink.search(/\/@.+\//);
+    if (usernamePos === -1) return;
+
+    const firstPart = steemitLink.slice(usernamePos + 2); // adding 2 to remove "/@"
+    return firstPart.slice(0, firstPart.search('/'));
+  }
+}
+
+/**
+ * Should input a full steemit article link and return the permlink of the article
+ * @param {string} steemitLink 
+ */
+function extractPermlinkFromLink(steemitLink) {
+  if (isValidSteemitLink(steemitLink)) {
+    const usernamePos = steemitLink.search(/\/@.+\//);
+    if (usernamePos === -1) return;
+
+    const firstPart = steemitLink.slice(usernamePos + 1); // adding 1 to remove the first "/"
+    return firstPart.slice(firstPart.search('/') + 1).replace('/', '');
+  }
 }
 
 export default class Responder {
-  constructor(targetUsername, targetPermlink, responderUsername, postingKey, activeKey) {
+  constructor({targetUsername, targetPermlink, transferMemo, responderUsername, postingKey, activeKey}) {
     this.targetUsername = targetUsername;
     this.targetPermlink = targetPermlink;
+    this.transferMemo = transferMemo;
     this.responderUsername = responderUsername;
     this.postingKey = postingKey;
     this.activeKey = activeKey;
@@ -57,8 +90,8 @@ export default class Responder {
     }
   }
 
-  _throwErrorIfNoPermlink() {
-    if (!this.targetPermlink) {
+  _throwErrorIfNoPermlink(targetPermlink) {
+    if (!targetPermlink) {
       throw(
         new Error(
           'You cannot send a comment to a responder comming from a deposit. There is no address to send a comment to!'
@@ -99,12 +132,16 @@ export default class Responder {
     );
   }
 
-  comment(message) {
+  comment(
+    message,
+    targetUsername = this.targetUsername,
+    targetPermlink = this.targetPermlink
+  ) {
     // early exits
-    this._throwErrorIfNoPermlink();
+    this._throwErrorIfNoPermlink(targetPermlink);
     this._throwErrorIfNoKey();
 
-    const permlink = createCommentPermlink(this.targetUsername, this.targetPermlink);
+    const permlink = createCommentPermlink(targetUsername, targetPermlink);
     const wif = this.postingKey || this.activeKey;
     const jsonMetadata = JSON.stringify({
       app: `steembot/${steemBotVersion}`,
@@ -112,8 +149,8 @@ export default class Responder {
 
     return steem.broadcast.commentAsync(
       wif,
-      this.targetUsername,
-      this.targetPermlink,
+      targetUsername,
+      targetPermlink,
       this.responderUsername,
       permlink,
       '',
@@ -122,8 +159,13 @@ export default class Responder {
     );
   }
 
-  upvote(votingPercentage = 100.0) {
+  upvote(
+    votingPercentage = 100.0,
+    targetUsername = this.targetUsername,
+    targetPermlink = this.targetPermlink
+  ) {
     this._throwErrorIfNoKey();
+    this._throwErrorIfNoPermlink(targetPermlink);
 
     if (typeof(votingPercentage) === 'string') {
       votingPercentage = parseFloat(votingPercentage);
@@ -139,14 +181,19 @@ export default class Responder {
     return steem.broadcast.voteAsync(
       wif,
       this.responderUsername,
-      this.targetUsername,
-      this.targetPermlink,
+      targetUsername,
+      targetPermlink,
       votingWeight
     );
   }
 
-  downvote(votingPercentage = 100.0) {
+  downvote(
+    votingPercentage = 100.0,
+    targetUsername = this.targetUsername,
+    targetPermlink = this.targetPermlink
+  ) {
     this._throwErrorIfNoKey();
+    this._throwErrorIfNoPermlink(targetPermlink);
 
     if (typeof(votingPercentage) === 'string') {
       votingPercentage = parseFloat(votingPercentage);
@@ -166,9 +213,30 @@ export default class Responder {
     return steem.broadcast.voteAsync(
       wif,
       this.responderUsername,
-      this.targetUsername,
-      this.targetPermlink,
+      targetUsername,
+      targetPermlink,
       votingWeight,
     );
+  }
+
+  upvoteOnMemo(votingPercentage = 100.0) {
+    const customTargetUsername = extractUsernameFromLink(this.transferMemo);
+    const customTargetPermlink = extractPermlinkFromLink(this.transferMemo);
+
+    return this.upvote(votingPercentage, customTargetUsername, customTargetPermlink);
+  }
+
+  downvoteOnMemo(votingPercentage = 100.0) {
+    const customTargetUsername = extractUsernameFromLink(this.transferMemo);
+    const customTargetPermlink = extractPermlinkFromLink(this.transferMemo);
+
+    return this.downvote(votingPercentage, customTargetUsername, customTargetPermlink);
+  }
+
+  commentOnMemo(message) {
+    const customTargetUsername = extractUsernameFromLink(this.transferMemo);
+    const customTargetPermlink = extractPermlinkFromLink(this.transferMemo);
+
+    return this.comment(message, customTargetUsername, customTargetPermlink);
   }
 }
