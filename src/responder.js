@@ -60,7 +60,7 @@ function extractPermlinkFromLink(steemitLink) {
     if (usernamePos === -1) return;
 
     const firstPart = steemitLink.slice(usernamePos + 1); // adding 1 to remove the first "/"
-    return firstPart.slice(firstPart.search('/') + 1).replace('/', '');
+    return firstPart.slice(firstPart.search('/') + 1).replace('/', '').replace('#', '');
   }
 }
 
