@@ -14,7 +14,13 @@ class SteemBotCore {
   handlePostOperation(op) {
     if (this.config.post && typeof(this.config.post.handler) === 'function') {
       const { targets, handler } = this.config.post;
-      const responder = new Responder(op.author, op.permlink, this.username, this.postingKey, this.activeKey);
+      const responder = new Responder({
+        targetUsername: op.author,
+        targetPermlink: op.permlink,
+        responderUsername: this.username,
+        postingKey: this.postingKey,
+        activeKey: this.activeKey,
+      });
 
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
         handler(op, responder);
@@ -27,8 +33,14 @@ class SteemBotCore {
   handleCommentOperation(op) {
     if (this.config.comment && typeof(this.config.comment.handler) === 'function') {
       const { targets, handler } = this.config.comment;
-      const responder = new Responder(op.author, op.permlink, this.username, this.postingKey, this.activeKey);
-      
+      const responder = new Responder({
+        targetUsername: op.author,
+        targetPermlink: op.permlink,
+        responderUsername: this.username,
+        postingKey: this.postingKey,
+        activeKey: this.activeKey,
+      });
+
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
         handler(op, responder);
       } else if (targets.includes(op.author)) {
@@ -40,8 +52,15 @@ class SteemBotCore {
   handleTransferOperation(op) {
     if (this.config.deposit && typeof(this.config.deposit.handler) === 'function') {
       const { targets, handler } = this.config.deposit;
-      const responder = new Responder(op.from, '', this.username, this.postingKey, this.activeKey);
-      
+      const responder = new Responder({
+        targetUsername: op.from,
+        targetPermlink: '',
+        responderUsername: this.username,
+        postingKey: this.postingKey,
+        activeKey: this.activeKey,
+        transferMemo: op.memo,
+      });
+
       if (typeof(targets) === 'string' && targets === ALL_USERS) {
         handler(op, responder);
       } else if (targets.includes(op.to)) {
