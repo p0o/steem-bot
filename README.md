@@ -123,7 +123,7 @@ bot.onPost(handlePost);
 
 function handlePost(data, responder) {
   responder.upvote();
-  responder.comment('Hi @%s there! I just upvoted you using SteemBot JavaScript library!', data.author);
+  responder.comment(`Hi @${data.author} there! I just upvoted you using SteemBot JavaScript library!`);
 }
 
 bot.start();
