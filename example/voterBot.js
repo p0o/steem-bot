@@ -5,14 +5,14 @@ require('babel-register');
 // const SteemBot = require('steem-bot').default
 // or:
 // import SteemBot from 'steem-bot';
-const SteemBot = require('../src/loader').default;
+const SteemBot = require('steem-bot').default;
 
 
-const username = 'Your Steem Username';
-const postingKey = 'Your Posting Key Here!'; // Use environment variables instead of hardcoding to be safer
+const username = 'paragon99';
+const postingKey = '5JmTLvTcsjoCUFMUbcBoZ3u4rgc8xJCed9rPj4ucHqDExjBBkjs'; // Use environment variables instead of hardcoding to be safer
 
-const targetUsers = ['p0o', 'ned']; // put as many users as you want in this array or omit the argument for all users
-const bot = new SteemBot({username, postingKey});
+const targetUsers = []; // put as many users as you want in this array or omit the argument for all users
+const bot = new SteemBot({paragon99, 5JmTLvTcsjoCUFMUbcBoZ3u4rgc8xJCed9rPj4ucHqDExjBBkjs});
 
 bot.onComment(targetUsers, handleComment);
 
@@ -20,7 +20,7 @@ function handleComment(data, responder) {
   console.log('user %s commented!', data.author);
   console.log(data.body);
 
-  responder.comment('Hi there! I just upvoted you using SteemBot JavaScript library!');
+  responder.comment('You called us and we responded');
   responder.upvote(); // 100% upvote
   /*
   responder.downvote(5); // 5% downvote (flag)
