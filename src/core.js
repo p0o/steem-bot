@@ -69,11 +69,23 @@ class SteemBotCore {
     }
   }
 
+  /**
+   * Resetting the streamOperations automatically after 5s
+   * Expected scenario is when a node is failing
+   */
+  resetOperations() {
+    setTimeout(() => {
+      this.init();
+    }, 5000);
+  }
+
   init() {
     steem.api.streamOperations((err, res) => {
       if (err) {
-        throw(new Error('Something went wrong with streamOperations method of Steem-js'));
-        console.log(err);
+        console.log('Something went wrong with streamOperations method of Steem-js');
+        console.log('Attempting to reset the connection...');
+        this.resetOperations();
+        return;
       }
         
       const opType = res[0];
