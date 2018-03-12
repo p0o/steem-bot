@@ -4,11 +4,12 @@ import { ALL_USERS } from './constants';
 import Responder from './responder';
 
 class SteemBotCore {
-  constructor({username, postingKey, activeKey, config}) {
+  constructor({username, postingKey, activeKey, config, node}) {
     this.username = username;
     this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = config;
+    this.node = node;
   }
 
   handlePostOperation(op) {
@@ -80,6 +81,10 @@ class SteemBotCore {
   }
 
   init() {
+    if (this.node) {
+      steem.api.setOptions({ url: this.node });
+    }
+
     return new Promise((resolve, reject) => {
       steem.api.streamOperations((err, res) => {
         if (err) {

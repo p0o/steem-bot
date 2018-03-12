@@ -25,11 +25,12 @@ function getConfig(args) {
 }
 
 export default class SteemBot {
-  constructor({username, postingKey, activeKey}) {
+  constructor({username, postingKey, activeKey, node}) {
     this.username = username && username.replace(/^@/, '');
     this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = {};
+    this.node = node;
 
     if (!username) {
       throw(new Error('Define your username as the first param of SteemBot constructor'));
@@ -54,6 +55,7 @@ export default class SteemBot {
       activeKey: this.activeKey,
       postingKey: this.postingKey,
       config: this.config,
+      node: this.node,
     });
     return loader.init();
   }
