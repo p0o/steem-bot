@@ -46,6 +46,8 @@ Here you can find some sample codes of things you can do with SteemBot.
 - Depositing Steem or SBD from users [click here](https://github.com/p0o/steem-bot/blob/master/example/deposit.js)
 - Auto voting on every new post from a list of users [click here](https://github.com/p0o/steem-bot/blob/master/example/voterBot.js)
 - Randowhale popular bot, full implementation [click here](https://github.com/p0o/steem-bot/blob/master/example/randowhale.js)
+- Change RPC node [click here](https://github.com/p0o/steem-bot/blob/master/example/changeNode.js)
+- Error handling [click here](https://github.com/p0o/steem-bot/blob/master/example/errorHandling.js)
 
 ## API
 
