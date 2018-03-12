@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/p0o/steem-bot#readme",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "steem": "^0.7.1"
   },
   "devDependencies": {
