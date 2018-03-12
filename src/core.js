@@ -1,4 +1,5 @@
 import steem from 'steem';
+import Promise from 'bluebird';
 import { ALL_USERS } from './constants';
 import Responder from './responder';
 
@@ -8,7 +9,6 @@ class SteemBotCore {
     this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = config;
-    this.init();
   }
 
   handlePostOperation(op) {
@@ -80,31 +80,34 @@ class SteemBotCore {
   }
 
   init() {
-    steem.api.streamOperations((err, res) => {
-      if (err) {
-        console.log('Something went wrong with streamOperations method of Steem-js');
-        console.log('Attempting to reset the connection...');
-        this.resetOperations();
-        return;
-      }
-        
-      const opType = res[0];
-      const op = res[1];
+    return new Promise((resolve, reject) => {
+      steem.api.streamOperations((err, res) => {
+        if (err) {
+          console.log('Something went wrong with streamOperations method of Steem-js');
+          console.log('Attempting to reset the connection...');
+          this.resetOperations();
+          return reject(err);
+        }
 
-      switch(opType) {
-        case 'comment':
-          // Both posts and comments are known as 'comment' in this API, so we recognize them by checking the
-          // value of parent_author
-          if (op.parent_author === '') {
-            this.handlePostOperation(op);
-          } else {
-            this.handleCommentOperation(op);
-          }
-          break;
-        case 'transfer':
-          this.handleTransferOperation(op);
-          break;
-      }
+        const opType = res[0];
+        const op = res[1];
+
+        switch(opType) {
+          case 'comment':
+            // Both posts and comments are known as 'comment' in this API, so we recognize them by checking the
+            // value of parent_author
+            if (op.parent_author === '') {
+              this.handlePostOperation(op);
+            } else {
+              this.handleCommentOperation(op);
+            }
+            break;
+          case 'transfer':
+            this.handleTransferOperation(op);
+            break;
+        }
+        resolve();
+      });
     });
   }
 }

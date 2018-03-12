@@ -55,5 +55,6 @@ export default class SteemBot {
       postingKey: this.postingKey,
       config: this.config,
     });
+    return loader.init();
   }
 }
