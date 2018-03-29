@@ -47,7 +47,8 @@ var SteemBot = function () {
   function SteemBot(_ref) {
     var username = _ref.username,
         postingKey = _ref.postingKey,
-        activeKey = _ref.activeKey;
+        activeKey = _ref.activeKey,
+        node = _ref.node;
 
     _classCallCheck(this, SteemBot);
 
@@ -55,6 +56,7 @@ var SteemBot = function () {
     this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = {};
+    this.node = node;
 
     if (!username) {
       throw new Error('Define your username as the first param of SteemBot constructor');
@@ -95,8 +97,10 @@ var SteemBot = function () {
         username: this.username,
         activeKey: this.activeKey,
         postingKey: this.postingKey,
-        config: this.config
+        config: this.config,
+        node: this.node
       });
+      return loader.init();
     }
   }]);
 
