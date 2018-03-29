@@ -10,6 +10,10 @@ var _steem = require('steem');
 
 var _steem2 = _interopRequireDefault(_steem);
 
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
 var _constants = require('./constants');
 
 var _responder = require('./responder');
@@ -25,7 +29,8 @@ var SteemBotCore = function () {
     var username = _ref.username,
         postingKey = _ref.postingKey,
         activeKey = _ref.activeKey,
-        config = _ref.config;
+        config = _ref.config,
+        node = _ref.node;
 
     _classCallCheck(this, SteemBotCore);
 
@@ -33,7 +38,7 @@ var SteemBotCore = function () {
     this.postingKey = postingKey;
     this.activeKey = activeKey;
     this.config = config;
-    this.init();
+    this.node = node;
   }
 
   _createClass(SteemBotCore, [{
@@ -106,34 +111,58 @@ var SteemBotCore = function () {
         }
       }
     }
+
+    /**
+     * Resetting the streamOperations automatically after 5s
+     * Expected scenario is when a node is failing
+     */
+
+  }, {
+    key: 'resetOperations',
+    value: function resetOperations() {
+      var _this = this;
+
+      setTimeout(function () {
+        _this.init();
+      }, 5000);
+    }
   }, {
     key: 'init',
     value: function init() {
-      var _this = this;
+      var _this2 = this;
 
-      _steem2.default.api.streamOperations(function (err, res) {
-        if (err) {
-          throw new Error('Something went wrong with streamOperations method of Steem-js');
-          console.log(err);
-        }
+      if (this.node) {
+        _steem2.default.api.setOptions({ url: this.node });
+      }
 
-        var opType = res[0];
-        var op = res[1];
+      return new _bluebird2.default(function (resolve, reject) {
+        _steem2.default.api.streamOperations(function (err, res) {
+          if (err) {
+            console.log('Something went wrong with streamOperations method of Steem-js');
+            console.log('Attempting to reset the connection...');
+            _this2.resetOperations();
+            return reject(err);
+          }
 
-        switch (opType) {
-          case 'comment':
-            // Both posts and comments are known as 'comment' in this API, so we recognize them by checking the
-            // value of parent_author
-            if (op.parent_author === '') {
-              _this.handlePostOperation(op);
-            } else {
-              _this.handleCommentOperation(op);
-            }
-            break;
-          case 'transfer':
-            _this.handleTransferOperation(op);
-            break;
-        }
+          var opType = res[0];
+          var op = res[1];
+
+          switch (opType) {
+            case 'comment':
+              // Both posts and comments are known as 'comment' in this API, so we recognize them by checking the
+              // value of parent_author
+              if (op.parent_author === '') {
+                _this2.handlePostOperation(op);
+              } else {
+                _this2.handleCommentOperation(op);
+              }
+              break;
+            case 'transfer':
+              _this2.handleTransferOperation(op);
+              break;
+          }
+          resolve();
+        });
       });
     }
   }]);
