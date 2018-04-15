@@ -208,6 +208,33 @@ var Responder = function () {
       return _steem2.default.broadcast.voteAsync(wif, this.responderUsername, targetUsername, targetPermlink, votingWeight);
     }
   }, {
+    key: 'resteem',
+    value: function resteem() {
+      var targetUsername = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.targetUsername;
+      var targetPermlink = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.targetPermlink;
+
+      this._throwErrorIfNoKey();
+      this._throwErrorIfNoPermlink(targetPermlink);
+
+      var wif = this.postingKey || this.activeKey;
+
+      var action = JSON.stringify(['reblog'], {
+        account: this.responserUsername,
+        author: targetUsername,
+        permlink: targetPermlink
+      });
+
+      return _steem2.default.broadcast.customJsonAsync(wif, [], [this.responderUsername], 'follow', action);
+    }
+  }, {
+    key: 'resteemOnMemo',
+    value: function resteemOnMemo() {
+      var customTargetUsername = extractUsernameFromLink(this.transferMemo);
+      var customTarget = extractPermlinkFromLink(this.transferMemo);
+
+      return this.resteem(customTargetUsername, customTarget);
+    }
+  }, {
     key: 'upvoteOnMemo',
     value: function upvoteOnMemo() {
       var votingPercentage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 100.0;
