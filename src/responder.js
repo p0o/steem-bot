@@ -227,28 +227,28 @@ export default class Responder {
     this._throwErrorIfNoPermlink(targetPermlink);
 
     const wif = this.postingKey || this.activeKey;
-		
-		const action = JSON.stringify(['reblog'], {
-		  account: this.responserUsername,
-		  author: targetUsername,
-		  permlink: targetPermlink
-		})
 
-		return steem.broadcast.customJsonAsync(
-			wif,
-		  [],
-		  [this.responderUsername],
-		  'follow',
-		  action
-		)
+    const action = JSON.stringify(['reblog'], {
+      account: this.responserUsername,
+      author: targetUsername,
+      permlink: targetPermlink
+    })
+
+    return steem.broadcast.customJsonAsync(
+      wif,
+      [],
+      [this.responderUsername],
+      'follow',
+      action
+    )
   }
-  
-  resteemOnMemo() {
-		const customTargetUsername = extractUsernameFromLink(this.transferMemo)
-		const customTarget = extractPermlinkFromLink(this.transferMemo)
 
-		return this.resteem(customTargetUsername, customTarget)
-	}
+  resteemOnMemo() {
+    const customTargetUsername = extractUsernameFromLink(this.transferMemo)
+    const customTarget = extractPermlinkFromLink(this.transferMemo)
+
+    return this.resteem(customTargetUsername, customTarget)
+  }
   
   upvoteOnMemo(votingPercentage = 100.0) {
     const customTargetUsername = extractUsernameFromLink(this.transferMemo);
